@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, createContext, useContext } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { bagCheckOutline } from "ionicons/icons";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ThemeProvider } from "@/components/theme-provider";
 import { useTheme } from "@/components/theme-provider";
+import UserInputs from "./components/UserInputs";
 
 setupIonicReact();
 
@@ -112,7 +113,13 @@ function App() {
     <>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <Toaster />
-        <div className="flex flex-col justify-center text-center  m-auto">
+        <UserInputs
+          setUserValue={setUserValue}
+          userValue={userValue}
+          onSubmit={(e) => handleForm(e)}
+        />
+
+        {/* <div className="flex flex-col justify-center text-center  m-auto">
           <h1 className=" text-4xl text-white"> Task Manager </h1>
           <div className="relative py-10 w-6/12 m-auto">
             <form
@@ -132,15 +139,12 @@ function App() {
               <Button className="py-6">Add</Button>
             </form>
           </div>
-        </div>
-        {/*  */}
+              </div> */}
         <div className="flex flex-col justify-center w-2/4 m-auto border-2 p-5 rounded-t-md">
-          {tasks.length == 0 ? (
+          {tasks.length == 0 && (
             <label className="text-base text-zinc-400 m-auto py-40">
               No task found, add one...
             </label>
-          ) : (
-            ""
           )}
           <ul className="flex flex-col h-fit whitespace-pre-line gap-y-2">
             {tasks.map((value, index) => (
@@ -159,14 +163,6 @@ function App() {
                     handleIndex(index);
                   }}
                 />
-                {/* <input
-                className="h-7 w-7 noHover "
-                checked={false}
-                onChange={() => {
-                  handleIndex(index);
-                }}
-                type="checkbox"
-              /> */}
                 {isEdit === index ? (
                   <div className="flex flex-col ">
                     <input
