@@ -13,21 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import moment from "moment";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ZoomInIcon } from "@radix-ui/react-icons";
-
-class DateClass {
-  public getDate(): string {
-    return moment().format("llll");
-  }
-}
+import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Foo = {
   work?: string;
@@ -43,19 +29,13 @@ type Props = {
 };
 
 const TaskList = ({ setTasks, tasks }: Props) => {
-  // const handleIndex = (index: number) => {
-  //   if (showIndex.includes(index))
-  //     setIndex(showIndex.filter((a) => a !== index));
-  //   else setIndex([...showIndex, index]);
-  // };
-
-  const handleComplete = (value: Foo) => {
+  const insertDoneTask = (value: Foo) => {
     setTasks(
       tasks.map((x) => {
         if (x.work == value.work) {
           return {
             ...x,
-            completed: true,
+            completed: !value.completed,
           };
         } else {
           return x;
@@ -65,22 +45,7 @@ const TaskList = ({ setTasks, tasks }: Props) => {
     console.log(tasks);
   };
 
-  const handleRemoveSingle = (value: Foo, index: number) => {
-    setTasks(tasks.filter((x) => x.work !== value.work));
-    let newArray = [];
-    for (let element of showIndex) {
-      if (index < element) newArray.push(--element);
-      else newArray.push(element);
-    }
-    setIndex(newArray); //re-ordenate indexes
-  };
-
-  const handleEditSingle = (value: Foo, newValue: string) => {
-    if (newValue === "") {
-      console.log("You cant set that");
-      return;
-    }
-
+  const editListTask = (value: Foo) => {
     setTasks(
       tasks.map((x) => {
         if (x.work == value.work) {
@@ -93,13 +58,22 @@ const TaskList = ({ setTasks, tasks }: Props) => {
         }
       })
     );
-    setEdit(999); //ONLY RESET NEDDED
+    setEdit(999); // MASTER RESET
+  };
+
+  const handleRemoveSingle = (value: Foo, index: number) => {
+    setTasks(tasks.filter((x) => x.work !== value.work));
+    let newArray = [];
+    for (let element of showIndex) {
+      if (index < element) newArray.push(--element);
+      else newArray.push(element);
+    }
+    setIndex(newArray); //re-ordenate indexes
   };
 
   const handleClear = () => {
-    let a = tasks.filter((x) => x.completed && x); // list of completeds
+    let a = tasks.filter((x) => x.completed && x); // getting list of done tasks
     let c = a.map((x) => {
-      // adding new object
       return {
         ...x,
         dateCompleted: moment().format("llll"),
@@ -151,9 +125,9 @@ const TaskList = ({ setTasks, tasks }: Props) => {
               style={{ maxHeight: "40vh" }}
             >
               {tasks.length == 0 && (
-                <label className="text-base text-zinc-400 m-auto">
+                <Label className="text-base text-zinc-400 m-auto">
                   No task found, add one...
-                </label>
+                </Label>
               )}
 
               {tasks.map((value, index) => (
@@ -167,8 +141,7 @@ const TaskList = ({ setTasks, tasks }: Props) => {
                     className="h-7 w-7"
                     checked={false}
                     onClick={() => {
-                      // handleIndex(index);
-                      handleComplete(value);
+                      insertDoneTask(value);
                     }}
                   />
                   {/* EDIT START */}
@@ -179,8 +152,8 @@ const TaskList = ({ setTasks, tasks }: Props) => {
                         type="text"
                         defaultValue={value.work}
                         onKeyDown={(y) => {
-                          y.key == "Enter"
-                            ? handleEditSingle(value, newValue)
+                          y.key == "Enter" && newValue !== ""
+                            ? editListTask(value)
                             : "";
                         }}
                         onChange={(e) => {
